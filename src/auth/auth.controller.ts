@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Post, Body } from '@nestjs/common';
-import { GetUserDto } from 'src/user/dto/get-user.dto';
 import { UserService } from 'src/user/user.service';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -18,7 +18,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  async signIn(@Body() userData: GetUserDto) {
+  async signIn(@Body() userData: CreateUserDto) {
     const user = await this.userService.findOne(userData.email);
     if (!user) {
       throw new UnauthorizedException();
