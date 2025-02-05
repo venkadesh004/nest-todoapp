@@ -1,30 +1,44 @@
-import { Body, Controller, Delete, HttpCode, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  HttpCode,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+  Req,
+  Get,
+} from '@nestjs/common';
 import { ListService } from './list.service';
-import { GetListDto } from './dto/get-list.dto';
-import { CreateListDto } from './dto/create-list.dto';
+import { AuthGuard } from 'src/guards/auth.guard';
+import { Request } from 'express';
 
+@UseGuards(AuthGuard)
 @Controller('list')
 export class ListController {
-    constructor(private readonly listService: ListService) { }
+  constructor(private readonly listService: ListService) {}
 
-    @HttpCode(200)
-    @Post('/getAllList')
-    getAllList(@Body() list: GetListDto) {
-        return this.listService.getAllList(list.email);
-    }
+  @HttpCode(200)
+  @Get('/getAllList')
+  getAllList(@Req() req: Request) {
+    // console.log(req.body.email);
+    return this.listService.getAllList(req.body.email);
+  }
 
-    @Post('/addList')
-    addList(@Body() listData: CreateListDto) {
-        return this.listService.addList(listData);
-    }
+  @Post('/addList')
+  addList(@Req() req: Request) {
+    // console.log(req['email']);
+    return this.listService.addList(req.body.email, req.body.content);
+  }
 
-    @Patch('/updateList/:id')
-    updateList(@Body() listData: CreateListDto, @Param('id') id: string) {
-        return this.listService.updateList(listData, id);
-    }
+  @Patch('/updateList/:id')
+  updateList(@Req() req: Request, @Param('id') id: string) {
+    return this.listService.updateList(req.body.email, req.body.content, id);
+  }
 
-    @Delete('/delete/:id')
-    deleteList(@Param('id') id: string) {
-        return this.listService.deleteList(id);
-    }
+  @Delete('/delete/:id')
+  deleteList(@Param('id') id: string) {
+    return this.listService.deleteList(id);
+  }
 }

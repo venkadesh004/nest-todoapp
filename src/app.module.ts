@@ -1,15 +1,30 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ListService } from './list/list.service';
-import { ListController } from './list/list.controller';
 import { ListModule } from './list/list.module';
+import { AuthModule } from './auth/auth.module';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [UserModule, ListModule, MongooseModule.forRoot('mongodb+srv://venkadesh:venkadesh@cluster0.qkqpr.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')],
+  imports: [
+    ConfigModule.forRoot({
+      envFilePath: '.env',
+      isGlobal: true,
+    }),
+    UserModule,
+    ListModule,
+    MongooseModule.forRoot(process.env.MONGO_URL),
+    JwtModule.register({
+      secret: process.env.SECRET,
+      global: true,
+      signOptions: { expiresIn: '60000s' },
+    }),
+    AuthModule,
+  ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, Logger],
 })
-export class AppModule { }
+export class AppModule {}
